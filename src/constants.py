@@ -1,9 +1,13 @@
+
+#CARD INDEXES
 SUIT = 0
 FACE = 1
 
+#SUIT AND FACE ENCODINGS
 SUITS = ["S", "H", "C", "D"]
 FACES = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K"]
 
+#REAL NAME MAPPINGS
 SUIT_NAMES = {"S": "Spade",
 			  "H": "Heart",
 			  "C": "Club",
@@ -21,6 +25,11 @@ FACE_NAMES = {"A": "Ace",
 			  "J": "Jack",
 			  "Q": "Queen",
 			  "K": "King"}
+
+#PLAYING RESPONSES
+HIT = 0
+DONE = 1
+FOLD = 2
 
 def cardDescription(card):
 	return FACE_NAMES[card[FACE]] + " of " + SUIT_NAMES[card[SUIT]] + "s"
