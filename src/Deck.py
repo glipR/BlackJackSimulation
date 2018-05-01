@@ -28,3 +28,9 @@ class Deck:
 			self.current_deck = self.current_deck[:index] + self.current_deck[index+1:]
 
 		return returning_card
+
+	def reset(self):
+		self.current_deck = [None] * (len(SUITS) * len(FACES))
+		for x in range(len(SUITS)):
+			for y in range(len(FACES)):
+				self.current_deck[x * len(FACES) + y] = [SUITS[x], FACES[y]]
