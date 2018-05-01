@@ -20,22 +20,39 @@ class Player:
 		self.cash = 10
 		self.hits = 3
 		self.verbose = True
+		self.cur_bet = 0
 
 	def startHand(self, card1, card2):
 		self.hands.append(Hand.Hand([card1, card2]))
 		self.cur_hand = 0
 
-	def response(self):
-		#Placeholder for testing
-		if self.hits > 0:
-			self.hits -= 1
-			return HIT
+	def hitResponse(self):
+		if len(self.hands) != 0:
+			if self.hands[0].score() < 18:
+				return HIT
+		return DONE
+
+	def betResponse(self, cur_bet):
+		if cur_bet > self.cur_bet:
+			if max([hand.score() for hand in self.hands]) > 16 + cur_bet and self.cash > 0:
+				return FOLLOW
+			else:
+				return FOLD
+		elif max([hand.score() for hand in self.hands]) > 16 + cur_bet and self.cash > 0:
+			return RAISE
 		else:
-			self.hits = 3
-			return DONE
+			return STAND
 
 	def hit(self, card):
 		self.hands[self.cur_hand].addCard(card)
 		if not self.hands[self.cur_hand].isValid():
-			#Remove the hand
-			pass
+			del self.hands[self.cur_hand]
+			return OVER
+		return GOOD
+
+	def getScores(self):
+		return [hand.score() for hand in self.hands]
+
+	def takeMoney(self, amount):
+		self.cash -= amount
+		self.cur_bet += amount

@@ -31,5 +31,30 @@ HIT = 0
 DONE = 1
 FOLD = 2
 
+GOOD = 0
+OVER = 1
+
+#BETTING RESPONSES
+FOLD = 0
+FOLLOW = 1
+RAISE = 2
+STAND = 3
+
+#MINIMUM VALUES
+MIN_VALUE = {"A": 1,
+			 "2": 2,
+			 "3": 3,
+			 "4": 4,
+			 "5": 5,
+			 "6": 6,
+			 "7": 7,
+			 "9": 9,
+			 "8": 8,
+			 "T":10,
+			 "J":10,
+			 "Q":10,
+			 "K":10}
+
+
 def cardDescription(card):
 	return FACE_NAMES[card[FACE]] + " of " + SUIT_NAMES[card[SUIT]] + "s"
