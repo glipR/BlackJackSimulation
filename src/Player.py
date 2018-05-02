@@ -34,7 +34,7 @@ class Player:
 
 	def betResponse(self, cur_bet):
 		if cur_bet > self.cur_bet:
-			if max([hand.score() for hand in self.hands]) > 16 + cur_bet and self.cash > 0:
+			if max([hand.score() for hand in self.hands]) > 15 + cur_bet and self.cash > 0:
 				return FOLLOW
 			else:
 				return FOLD

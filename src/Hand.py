@@ -26,3 +26,10 @@ class Hand:
 			if card_sum < 12:
 				card_sum += 10
 		return card_sum
+
+	def highCard(self):
+		cur = self.cards[0]
+		for x in range(1, len(self.cards)):
+			if compareHighCard(cur, self.cards[x]) == 1:
+				cur = self.cards[x]
+		return cur

@@ -25,19 +25,36 @@ class Game:
 		self.pool = 0
 
 	def dealTwoCards(self):
+		"""
+		Deals two cards to all players
+		(Meant for game start, doesn't currently deal with Dealer hand)
+		:return:
+		"""
 		for player in self.playing_players:
 			card1, card2 = self.deck.pick_card(), self.deck.pick_card()
 			player.startHand(card1, card2)
 			if self.verbose:
 				print("{} received the {} and the {}".format(player.name, cardDescription(card1), cardDescription(card2)))
 
-	def hittingRound(self):
+	def playerState(self, player):
+		"""
+		Gets the card state of the game, excluding the player argument
+		:param player: Player whose hands you will exclude
+		:return: list of players, from which the player can surmise cards + bets
+		"""
+
+	def dealingRound(self):
+		"""
+		Simulates the dealing round of all players
+		:return: none
+		"""
 		removing_players = []
 		for player in self.playing_players:
 			while True:
 				response = player.hitResponse()
 				if response == HIT:
 					card = self.deck.pick_card()
+					card[VIS] = True
 					hit_response = player.hit(card)
 					if self.verbose:
 						print("{} hit and recieved {}".format(player.name, cardDescription(card)))
@@ -95,18 +112,64 @@ class Game:
 				raise ValueError("I don't understand betting response {}".format(response))
 			player_ind = (player_ind + 1) % len(self.playing_players)
 
-
+	def comparePlayers(self, players):
+		"""
+		Compares the remaining players hands and returns the winner
+		:param players: the list of remaining players
+		:return: the final player
+		"""
+		hands = []
+		for player in players:
+			for hand in player.hands:
+				hands.append((hand, player))
+		maxScore = max(hands, key = lambda x: x[0].score())[0].score()
+		x = 0
+		while x < len(hands):
+			if hands[x][0].score() < maxScore:
+				del hands[x]
+			else:
+				x += 1
+		if len(hands) == 1:
+			return hands[0][1]
+		if maxScore == 21 and len(min(hands, key = lambda x: len(x[0].cards))[0].cards) == 2:
+			#Blackjack present
+			x = 0
+			while x < len(hands):
+				if len(hands[x][0].cards) > 2:
+					del hands[x]
+				else:
+					x += 1
+			if len(hands) == 1:
+				return hands[0][1]
+			while len(hands) > 1:
+				card1 = hands[0][0].highCard()
+				card2 = hands[1][0].highCard()
+				if compareHighCard(card1, card2) == 0:
+					del hands[1]
+				else:
+					del hands[0]
+			return hands[0][1]
+		else:
+			while len(hands) > 1:
+				card1 = hands[0][0].highCard()
+				card2 = hands[1][0].highCard()
+				if compareHighCard(card1, card2) == 0:
+					del hands[1]
+				else:
+					del hands[0]
+			return hands[0][1]
 
 	def playGame(self):
 		self.dealTwoCards()
 		self.initialBet()
-		self.hittingRound()
+		self.dealingRound()
 		self.bettingRound()
 		if self.verbose:
 			if len(self.playing_players) == 0:
 				print("The dealer wins!")
 			else:
-				print("{} won the pool of ${}".format(self.playing_players[0].name, self.pool))
+				winning_player = self.comparePlayers(self.playing_players)
+				print("{} won the pool of ${}".format(winning_player.name, self.pool))
 
 
 test = Game()

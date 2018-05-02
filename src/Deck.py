@@ -14,7 +14,7 @@ class Deck:
 		self.current_deck = [None]*(len(SUITS)*len(FACES))
 		for x in range(len(SUITS)):
 			for y in range(len(FACES)):
-				self.current_deck[x*len(FACES) + y] = [SUITS[x], FACES[y]]
+				self.current_deck[x*len(FACES) + y] = [SUITS[x], FACES[y], False]
 
 
 	def pick_card(self, replacement = False):
