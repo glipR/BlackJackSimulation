@@ -1,6 +1,7 @@
 from constants import *
 import Deck
 import Player
+import GameState
 
 """
 Game Implementation
@@ -24,6 +25,8 @@ class Game:
 
 		self.pool = 0
 
+		self.gameState = GameState.gameState()
+
 	def dealTwoCards(self):
 		"""
 		Deals two cards to all players
@@ -34,14 +37,7 @@ class Game:
 			card1, card2 = self.deck.pick_card(), self.deck.pick_card()
 			player.startHand(card1, card2)
 			if self.verbose:
-				print("{} received the {} and the {}".format(player.name, cardDescription(card1), cardDescription(card2)))
-
-	def playerState(self, player):
-		"""
-		Gets the card state of the game, excluding the player argument
-		:param player: Player whose hands you will exclude
-		:return: list of players, from which the player can surmise cards + bets
-		"""
+				print("{} received the\n\t{} and the\n\t{} {}".format(player.name, cardDescription(card1), cardDescription(card2), player.getScores()))
 
 	def dealingRound(self):
 		"""
@@ -51,13 +47,14 @@ class Game:
 		removing_players = []
 		for player in self.playing_players:
 			while True:
-				response = player.hitResponse()
+				self.updateGameState()
+				response = player.hitResponse(self.gameState)
 				if response == HIT:
 					card = self.deck.pick_card()
 					card[VIS] = True
 					hit_response = player.hit(card)
 					if self.verbose:
-						print("{} hit and recieved {}".format(player.name, cardDescription(card)))
+						print("{} hit and recieved the\n\t{}".format(player.name, cardDescription(card)))
 						if hit_response == GOOD:
 							print("{} still has a valid hand!".format(player.name))
 						elif hit_response == OVER:
@@ -70,6 +67,8 @@ class Game:
 				elif response == DONE:
 					if self.verbose:
 						print("{} ended the round with hands with scores {}".format(player.name, player.getScores()))
+						for hand in player.hands:
+							print("\t{}".format(hand.knownHand()))
 					break
 		for player in removing_players:
 			self.playing_players.remove(player)
@@ -84,8 +83,9 @@ class Game:
 		player_ind = 0
 		self.same_bet = 0
 		while len(self.playing_players) > 1 and self.same_bet < 2*len(self.playing_players):
+			self.updateGameState()
 			player = self.playing_players[player_ind]
-			response = player.betResponse(self.cur_bet)
+			response = player.betResponse(self.gameState)
 			if response == RAISE:
 				if self.verbose:
 					print("{} Raises the bet!".format(player.name))
@@ -170,6 +170,11 @@ class Game:
 			else:
 				winning_player = self.comparePlayers(self.playing_players)
 				print("{} won the pool of ${}".format(winning_player.name, self.pool))
+
+	def updateGameState(self):
+		self.gameState.reset()
+		for player in self.players:
+			self.gameState.addPlayer(player)
 
 
 test = Game()

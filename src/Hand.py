@@ -33,3 +33,6 @@ class Hand:
 			if compareHighCard(cur, self.cards[x]) == 1:
 				cur = self.cards[x]
 		return cur
+
+	def knownHand(self):
+		return "".join(["?" if not card[VIS] else card[FACE] for card in self.cards])
