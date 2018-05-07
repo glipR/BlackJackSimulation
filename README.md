@@ -48,3 +48,4 @@ Version 0.1
 * Separate `Player.py` into its generic definition and the default AI, called `Default.py`
 * Change how card comparison works in `Game.py` to better represent how BlackJack works
 * Add functionality for splitting, implemented by the `Player` class
+* Change how betting system works so that each hand gets one hit response in a circle, until all hands return a stand response
