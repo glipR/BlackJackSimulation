@@ -19,7 +19,6 @@ class Player:
 		self.hands = []
 		self.cash = 10
 		self.hits = 3
-		self.verbose = True
 		self.cur_bet = 0
 
 	def startHand(self, card1, card2):
