@@ -116,48 +116,41 @@ class Game:
 		"""
 		Compares the remaining players hands and returns the winner
 		:param players: the list of remaining players
-		:return: the final player
+		:return: an array containing all winning players
 		"""
 		hands = []
 		for player in players:
 			for hand in player.hands:
 				hands.append((hand, player))
-		maxScore = max(hands, key = lambda x: x[0].score())[0].score()
-		x = 0
-		while x < len(hands):
-			if hands[x][0].score() < maxScore:
-				del hands[x]
-			else:
-				x += 1
-		if len(hands) == 1:
-			return hands[0][1]
-		if maxScore == 21 and len(min(hands, key = lambda x: len(x[0].cards))[0].cards) == 2:
-			#Blackjack present
-			x = 0
-			while x < len(hands):
-				if len(hands[x][0].cards) > 2:
-					del hands[x]
-				else:
-					x += 1
-			if len(hands) == 1:
-				return hands[0][1]
-			while len(hands) > 1:
-				card1 = hands[0][0].highCard()
-				card2 = hands[1][0].highCard()
-				if compareHighCard(card1, card2) == 0:
-					del hands[1]
-				else:
-					del hands[0]
-			return hands[0][1]
-		else:
-			while len(hands) > 1:
-				card1 = hands[0][0].highCard()
-				card2 = hands[1][0].highCard()
-				if compareHighCard(card1, card2) == 0:
-					del hands[1]
-				else:
-					del hands[0]
-			return hands[0][1]
+		### Rule 1 - Blackjack
+		winners = []
+		for hand in hands:
+			if hand[0].isBlackjack():
+				winners.append(hand)
+		if winners != []:
+			return winners
+
+		### Rule 2 - 21
+		for hand in hands:
+			if hand[0].score() == 21:
+				winners.append(hand)
+		if winners != []:
+			return winners
+
+		### Rule 3 - 5 Card
+		for hand in hands:
+			if len(hand[0]) >= 5:
+				winners.append(hand)
+		if winners != []:
+			return winners
+
+		### Rule 4 - Score
+		max_score = max(hands, key = lambda x: x[0].score())[0].score()
+		for hand in hands:
+			if hand[0].score() == max_score:
+				winners.append(hand)
+		# Winners is definitely non zero
+		return winners
 
 	def playGame(self):
 		self.dealTwoCards()
@@ -168,8 +161,24 @@ class Game:
 			if len(self.playing_players) == 0:
 				print("The dealer wins!")
 			else:
-				winning_player = self.comparePlayers(self.playing_players)
-				print("{} won the pool of ${}".format(winning_player.name, self.pool))
+				winning_players = self.comparePlayers(self.playing_players)
+				if len(winning_players) == 1:
+					player = winning_players[0][1]
+					print("{} won the pool of ${}".format(player.name, self.pool))
+					player.giveMoney(self.pool)
+				elif len(set([x[1] for x in winning_players])) == 1:
+					player = winning_players[0][1]
+					print("{} won the pool of ${}".format(player.name, self.pool))
+					player.giveMoney(self.pool)
+				else:
+					player_dict = {}
+					for hand in winning_players:
+						if hand[1] not in player_dict.keys():
+							player_dict[hand[1]] = 0
+						player_dict[hand[1]] += 1
+					for key in player_dict.keys():
+						print("{} won {}/{} of the pool of ${}".format(key.name, player_dict[key], len(winning_players), self.pool))
+						key.giveMoney(self.pool * player_dict[key] // len(winning_players))
 
 	def updateGameState(self):
 		self.gameState.reset()

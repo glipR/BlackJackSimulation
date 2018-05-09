@@ -18,12 +18,14 @@ class Player:
 		self.name = name
 		self.hands = []
 		self.cash = 10
-		self.hits = 3
 		self.cur_bet = 0
 
 	def startHand(self, card1, card2):
 		self.hands.append(Hand.Hand([card1, card2]))
 		self.cur_hand = 0
+
+	def newRound(self):
+		self.cur_bet = 0
 
 	def hitResponse(self, state):
 		if len(self.hands) != 0:
@@ -56,3 +58,6 @@ class Player:
 	def takeMoney(self, amount):
 		self.cash -= amount
 		self.cur_bet += amount
+
+	def giveMoney(self, amount):
+		self.cash += amount

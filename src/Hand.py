@@ -15,6 +15,12 @@ class Hand:
 	def isValid(self):
 		return self.score() <= 21
 
+	def isBlackjack(self):
+		if len(self.cards) == 2:
+			if (self.cards[0][FACE] == "J" and self.cards[1][FACE] == "A") or (self.cards[0][FACE] == "A" and self.cards[1][FACE] == "J"):
+				return True
+		return False
+
 	def score(self):
 		count_aces = 0
 		card_sum = 0
