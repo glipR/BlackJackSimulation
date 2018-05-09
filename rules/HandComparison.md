@@ -5,52 +5,30 @@
 
 ## Rules
 
-### 1. Score Split
+### 1. Blackjack
 
-First, find the maximum score of all hands, and remove all hands which score is not equal to this
+If any hand is a blackjack (Jack + Ace), they win the round by default
 
-#### Example
-> Hands: [AH, 6D], [TS, 9H], [7C, 8D, 4S]
+> Hands: [KS, AC], [AS, JC], [QD, 5H, 6S], [JH, AD]
 >
-> Scores: 17, 19, 19
+> Blackjack: No, Yes, No, Yes
 >
-> Remaining Hands: [TS, 9H], [7C, 8D, 4S] with score 19
+> Winning Hands: [AS, JC], [JH, AD]
 
-### 2. Blackjack
+### 2. 21
 
-If any of the hands are blackjack (Jack + Ace), they instantly win
+If no blackjack, then any hand which scores 21 wins
 
-If not, if any of the hands are 2-card 21, they instantly win
+### 3. 5 Card
 
-#### Example
-> Hands: [JD, AS], [KH, AC], [TH, QC, AD], [JH, AH]
-> 
-> Scores: 21, 21, 21, 21
+If noone has a 21 of any card, but someone has a hand with 5-cards which is not busted, then they win.
+
+> Hands: [AS, 4H, 5D], [3C, 2H, 6D, AC, 3S]
 >
-> Winners: [JD, AS], [JH, AH]
-
-### 3. 5-Card
-
-If no winners are selected so far and there is a hand with 5 cards present, they win
-
-#### Example
-> Hands: [3H, 5S, 2C, 8D, AS], [10H, 9C], [AD, 8C]
+> Scores: 20, 15
 >
-> Scores: 19, 19, 19
->
-> Winner: [3H, 5S, 2C, 8D, AS]
+> Winning Hand: [3C, 2H, 6D, AC, 3S]
 
-### 4. End
+### 4. Numeric
 
-If there are no winner cards yet, all remaining cards are winners
-
-#### Example
-> Hands: [2H, TS, 7H], [8H, 4C, AC, 2C, AS, 2S], [4D, KD, 2D, 3H]
->
-> Scores: 19, 18, 19
->
-> Hands After Rule 1: [2H, TS, 7H], [4D, KD, 2D, 3H]
->
-> No blackjacks or 5 cards
->
-> Winners: [2H, TS, 7H], [4D, KD, 2D, 3H]
+If none of these rules are met by a single hand, then all cards with the highest numeric score win.
