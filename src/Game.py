@@ -1,6 +1,7 @@
 from constants import *
 import Deck
-import Player
+import DummyPlayer
+import HumanPlayer
 import GameState
 
 """
@@ -13,9 +14,9 @@ class Game:
 
 	def __init__(self):
 
-		self.players = [Player.Player(name= "Player 1"),
-						Player.Player(name= "Player 2"),
-						Player.Player(name= "Player 3")]
+		self.players = [DummyPlayer.DummyPlayer(name= "AI"),
+						DummyPlayer.DummyPlayer(name= "AI"),
+						HumanPlayer.HumanPlayer(name= "Me")]
 
 		self.playing_players = [player for player in self.players]
 
@@ -177,7 +178,7 @@ class Game:
 							player_dict[hand[1]] = 0
 						player_dict[hand[1]] += 1
 					for key in player_dict.keys():
-						print("{} won {}/{} of the pool of ${}".format(key.name, player_dict[key], len(winning_players), self.pool))
+						print("{} won {}/{} of the pool of ${}".format(key.name, player_dict[key], len(winning_players), self.pool*player_dict[key]//len(winning_players)))
 						key.giveMoney(self.pool * player_dict[key] // len(winning_players))
 
 	def updateGameState(self):

@@ -9,6 +9,9 @@ class Hand:
 	def __init__(self, cards):
 		self.cards = cards
 
+	def __len__(self):
+		return len(self.cards)
+
 	def addCard(self, card):
 		self.cards.append(card)
 
