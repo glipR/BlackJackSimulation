@@ -20,3 +20,10 @@ class DummyPlayer(GenericPlayer):
 		else:
 			return STAND
 
+	def surrenderResponse(self, state):
+		return False
+
+	def splitResponse(self, state):
+		if self.hands[0].canSplit():
+			return True
+

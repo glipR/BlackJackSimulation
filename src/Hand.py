@@ -43,5 +43,11 @@ class Hand:
 				cur = self.cards[x]
 		return cur
 
+	def canSplit(self):
+		if len(self) == 2:
+			if self.cards[0][FACE] == self.cards[1][FACE]:
+				return True
+		return False
+
 	def knownHand(self):
 		return "".join(["?" if not card[VIS] else card[FACE] for card in self.cards])

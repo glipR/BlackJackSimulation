@@ -31,14 +31,39 @@ class Game:
 	def dealTwoCards(self):
 		"""
 		Deals two cards to all players
-		(Meant for game start, doesn't currently deal with Dealer hand)
-		:return:
 		"""
 		for player in self.playing_players:
 			card1, card2 = self.deck.pick_card(), self.deck.pick_card()
 			player.startHand(card1, card2)
 			if self.verbose:
 				print("{} received the\n\t{} and the\n\t{} {}".format(player.name, cardDescription(card1), cardDescription(card2), player.getScores()))
+
+	def offerSurrender(self):
+		"""
+		Offers each player to surrender, and removes them should this be the case
+		"""
+		keep = []
+		for player in self.playing_players:
+			self.updateGameState()
+			if player.surrenderResponse(self.gameState):
+				player.giveMoney(self.gameState.cur_bet()/2)
+				if self.verbose:
+					print("{} Surrendered and recieved ${} back".format(player.name, self.gameState.cur_bet()/2))
+			else:
+				keep.append(player)
+
+	def offerSplit(self):
+		"""
+		Offers each player to split their cards, also checks that a split is possible
+		"""
+		for player in self.players:
+			self.updateGameState()
+			if player.splitResponse(self.gameState):
+				card1, card2 = self.deck.pick_card(), self.deck.pick_card()
+				player.setSplit(card1, card2)
+				player.takeMoney(self.gameState.cur_bet())
+				if self.verbose:
+					print("{} Split their hand, and recieved 2 new cards".format(player.name))
 
 	def dealingRound(self):
 		"""
@@ -156,6 +181,8 @@ class Game:
 	def playGame(self):
 		self.dealTwoCards()
 		self.initialBet()
+		self.offerSurrender()
+		self.offerSplit()
 		self.dealingRound()
 		self.bettingRound()
 		if self.verbose:
