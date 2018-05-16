@@ -14,8 +14,8 @@ class Game:
 
 	def __init__(self):
 
-		self.players = [DummyPlayer.DummyPlayer(name= "AI"),
-						DummyPlayer.DummyPlayer(name= "AI"),
+		self.players = [DummyPlayer.DummyPlayer(name= "AI1"),
+						DummyPlayer.DummyPlayer(name= "AI2"),
 						HumanPlayer.HumanPlayer(name= "Me")]
 
 		self.playing_players = [player for player in self.players]
@@ -63,84 +63,105 @@ class Game:
 			self.updateGameState()
 			if player.splitResponse(self.gameState):
 				card1, card2 = self.deck.pick_card(), self.deck.pick_card()
+				player.giveMoney(self.gameState.cur_bet())
 				player.setSplit(card1, card2)
-				player.takeMoney(self.gameState.cur_bet())
+				player.takeMoney(self.gameState.cur_bet(), player.hands[0])
+				print(player.hands[0].cur_bet)
+				player.takeMoney(self.gameState.cur_bet(), player.hands[1])
 				self.pool += self.gameState.cur_bet()
 				if self.verbose:
 					print("{} Split their hand, and recieved 2 new cards".format(player.name))
 
-	def dealingRound(self):
+	def simRound(self):
 		"""
-		Simulates the dealing round of all players
-		:return: none
+		Simulates a round of blackjack
+		:return whether to finish the game after this round
 		"""
-		removing_players = []
+		#Create an array which can be used to find the correct hand, player
+		hands_arr = []
 		for player in self.playing_players:
-			while True:
-				self.updateGameState()
-				response = player.hitResponse(self.gameState)
-				if response == HIT:
+			for hand in player.hands:
+				hands_arr.append([hand, player])
+		#First, prompt for betting, then dealing
+
+		#If everyone stands, with no hits, then stop
+		all_stand = True
+
+		for hand, player in hands_arr:
+
+			self.updateGameState()
+
+			if self.verbose:
+				print("Player {}, Hand {}".format(player.name, player.hands.index(hand)))
+
+			## Betting
+
+			betResponse = player.betResponse(hand, self.gameState)
+			if betResponse == RAISE:
+				all_stand = False
+				if self.verbose:
+					print("\tRaises")
+				self.cur_bet += 1
+				player.takeMoney(1, hand)
+				self.pool += 1
+			elif betResponse == FOLLOW:
+				all_stand = False
+				if self.verbose:
+					print("\tFollows")
+				player.takeMoney(1, hand)
+				self.pool += 1
+			elif betResponse == STAND:
+				if self.verbose:
+					print("\tStands")
+			elif betResponse == FOLD:
+				all_stand = False
+				if self.verbose:
+					print("\tFolds")
+			else:
+				raise ValueError("I don't understand betting response {}".format(betResponse))
+
+			## Dealing
+
+			all_done = True
+
+			if betResponse != FOLD and not hand.done:
+				if self.verbose:
+					print("\tThen")
+
+				hitResponse = player.hitResponse(hand, self.gameState)
+				if hitResponse == HIT:
+					all_done = False
 					card = self.deck.pick_card()
 					card[VIS] = True
-					hit_response = player.hit(card)
+					player.hit(card, hand)
 					if self.verbose:
-						print("{} hit and recieved the\n\t{}".format(player.name, cardDescription(card)))
-						if hit_response == GOOD:
-							print("{} still has a valid hand!".format(player.name))
-						elif hit_response == OVER:
-							print("{} busted their hand!".format(player.name))
-					if len(player.hands) == 0:
-						removing_players.append(player)
-				elif response == FOLD:
-					removing_players.append(player)
-					break
-				elif response == DONE:
+						print("\tHit and recieved the {}".format(cardDescription(card)))
+				if hitResponse == DONE:
+					player.hands[player.hands.index(hand)].done = True
 					if self.verbose:
-						print("{} ended the round with hands with scores {}".format(player.name, player.getScores()))
-						for hand in player.hands:
-							print("\t{}".format(hand.knownHand()))
-					break
-		for player in removing_players:
-			self.playing_players.remove(player)
+						print("\tDoes not hit")
+
+		# Remove any hands / players that busted
+
+		to_remove = []
+		for x in range(len(self.playing_players)):
+			self.playing_players[x].update()
+			if len(self.playing_players[x].hands) == 0:
+				to_remove.append(x)
+		for y in sorted(to_remove)[::-1]:
+			if self.verbose:
+				print("{} is out of valid hands!".format(self.playing_players[y].name))
+			del self.playing_players[y]
+
+		# Return whether every stood / held
+
+		return (all_stand and all_done)
 
 	def initialBet(self):
 		for player in self.playing_players:
-			player.takeMoney(1)
+			player.takeMoney(1, player.hands[0])
 			self.pool += 1
 			self.cur_bet = 1
-
-	def bettingRound(self):
-		player_ind = 0
-		self.same_bet = 0
-		while len(self.playing_players) > 1 and self.same_bet < 2*len(self.playing_players):
-			self.updateGameState()
-			player = self.playing_players[player_ind]
-			response = player.betResponse(self.gameState)
-			if response == RAISE:
-				if self.verbose:
-					print("{} Raises the bet!".format(player.name))
-				self.cur_bet += 1
-				self.same_bet = 1
-				player.takeMoney(1)
-				self.pool += 1
-			elif response == FOLLOW:
-				if self.verbose:
-					print("{} Follows the previous bet".format(player.name))
-				self.same_bet += 1
-				player.takeMoney(1)
-				self.pool += 1
-			elif response == STAND:
-				if self.verbose:
-					print("{} is happy to stand".format(player.name))
-				self.same_bet += 1
-			elif response == FOLD:
-				if self.verbose:
-					print("{} is out!".format(player.name))
-				del self.playing_players[player_ind]
-				player_ind -= 1
-			else:
-				raise ValueError("I don't understand betting response {}".format(response))
-			player_ind = (player_ind + 1) % len(self.playing_players)
 
 	def comparePlayers(self, players):
 		"""
@@ -187,12 +208,18 @@ class Game:
 		self.initialBet()
 		self.offerSurrender()
 		self.offerSplit()
-		self.dealingRound()
-		self.bettingRound()
+		res = False
+		while not res and len(self.playing_players) > 1:
+			res = self.simRound()
 		if self.verbose:
 			if len(self.playing_players) == 0:
 				print("The dealer wins!")
 			else:
+				if self.verbose:
+					print("The remaining hands are:")
+					for player in self.playing_players:
+						for hand in player.hands:
+							print("{} Hand {}: {}".format(player.name, player.hands.index(hand), hand.allHand()))
 				winning_players = self.comparePlayers(self.playing_players)
 				if len(winning_players) == 1:
 					player = winning_players[0][1]

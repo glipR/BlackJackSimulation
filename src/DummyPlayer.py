@@ -2,20 +2,20 @@ from GenericPlayer import *
 
 class DummyPlayer(GenericPlayer):
 
-	def hitResponse(self, state):
-		if len(self.hands) != 0:
-			if self.hands[0].score() < 18:
-				return HIT
+	def hitResponse(self, hand, state):
+		if hand.score() < 18:
+			return HIT
 		return DONE
 
-	def betResponse(self, state):
+	def betResponse(self, hand, state):
 		board_bet = state.cur_bet()
-		if board_bet > self.cur_bet:
-			if max([hand.score() for hand in self.hands]) > 15 + board_bet and self.cash > 0:
+		if board_bet > hand.cur_bet:
+			if hand.score() > 15 + board_bet and self.cash > 0:
 				return FOLLOW
 			else:
+				self.removing.append(self.hands.index(hand))
 				return FOLD
-		elif max([hand.score() for hand in self.hands]) > 16 + board_bet and self.cash > 0:
+		elif hand.score() > 16 + board_bet and self.cash > 0:
 			return RAISE
 		else:
 			return STAND

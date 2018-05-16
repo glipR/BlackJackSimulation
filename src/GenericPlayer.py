@@ -19,19 +19,19 @@ class GenericPlayer:
 		self.hands = []
 		self.cash = 10
 		self.cur_bet = 0
+		self.removing = []
 
 	def startHand(self, card1, card2):
 		self.hands.append(Hand.Hand([card1, card2]))
-		self.cur_hand = 0
 
 	def newRound(self):
 		self.cur_bet = 0
 
-	def hitResponse(self, state):
+	def hitResponse(self, hand, state):
 		#Implemented by each individual
 		return
 
-	def betResponse(self, state):
+	def betResponse(self, hand, state):
 		#Implemented by each individual
 		return
 
@@ -50,19 +50,22 @@ class GenericPlayer:
 		hand2 = Hand.Hand([self.hands[0].cards[1], card2])
 		self.hands = [hand1, hand2]
 
-	def hit(self, card):
-		self.hands[self.cur_hand].addCard(card)
-		if not self.hands[self.cur_hand].isValid():
-			del self.hands[self.cur_hand]
-			return OVER
-		return GOOD
+	def hit(self, card, hand):
+		self.hands[self.hands.index(hand)].addCard(card)
+		if not self.hands[self.hands.index(hand)].isValid():
+			self.removing.append(self.hands.index(hand))
+
+	def update(self):
+		for index in self.removing[::-1]:
+			del self.hands[index]
+		self.removing = []
 
 	def getScores(self):
 		return [hand.score() for hand in self.hands]
 
-	def takeMoney(self, amount):
+	def takeMoney(self, amount, hand):
 		self.cash -= amount
-		self.cur_bet += amount
+		self.hands[self.hands.index(hand)].cur_bet += amount
 
 	def giveMoney(self, amount):
 		self.cash += amount

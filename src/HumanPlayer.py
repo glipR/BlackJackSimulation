@@ -2,7 +2,7 @@ from GenericPlayer import *
 
 class HumanPlayer(GenericPlayer):
 
-	def hitResponse(self, state):
+	def hitResponse(self, hand, state):
 		print(state.printState(self))
 		while True:
 			x = input("1: HIT, 2: DONE")
@@ -15,9 +15,9 @@ class HumanPlayer(GenericPlayer):
 				continue
 		
 
-	def betResponse(self, state):
+	def betResponse(self, hand, state):
 		board_bet = state.cur_bet()
-		if board_bet > self.cur_bet:
+		if board_bet > hand.cur_bet:
 			print(state.printState(self))
 			while True:
 				x = input("1: FOLLOW, 2: FOLD")
@@ -25,6 +25,7 @@ class HumanPlayer(GenericPlayer):
 					if int(x) == 1:
 						return FOLLOW
 					elif int(x) == 2:
+						self.removing.append(self.hands.index(hand))
 						return FOLD
 				except:
 					continue

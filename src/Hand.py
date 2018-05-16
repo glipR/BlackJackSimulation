@@ -8,6 +8,8 @@ class Hand:
 
 	def __init__(self, cards):
 		self.cards = cards
+		self.done = False
+		self.cur_bet = 0
 
 	def __len__(self):
 		return len(self.cards)
@@ -51,3 +53,6 @@ class Hand:
 
 	def knownHand(self):
 		return "".join(["?" if not card[VIS] else card[FACE] for card in self.cards])
+
+	def allHand(self):
+		return "".join(card[FACE] for card in self.cards)
