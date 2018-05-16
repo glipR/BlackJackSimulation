@@ -37,16 +37,17 @@ class GenericPlayer:
 
 	def surrenderResponse(self, state):
 		#Implemented by each individual
-		return False
+		return
 
 	def splitResponse(self, state):
 		#Implemented by each individual
+		return
 
 	def setSplit(self, card1, card2):
-		self.hands[0][0][VIS] = True
-		self.hands[0][1][VIS] = True
-		hand1 = Hand.Hand([self.hands[0][0], card1])
-		hand2 = Hand.Hand([self.hands[0][1], card2])
+		self.hands[0].cards[0][VIS] = True
+		self.hands[0].cards[1][VIS] = True
+		hand1 = Hand.Hand([self.hands[0].cards[0], card1])
+		hand2 = Hand.Hand([self.hands[0].cards[1], card2])
 		self.hands = [hand1, hand2]
 
 	def hit(self, card):

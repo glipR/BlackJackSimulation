@@ -39,3 +39,19 @@ class HumanPlayer(GenericPlayer):
 						return STAND
 				except:
 					continue
+
+	def surrenderResponse(self, state):
+		print(state.printState(self))
+		result = ""
+		while not(result.lower() in ["y", "n"]):
+			result = input("Would you like to surrender? (Y/N): ")
+		return True if result=="y" else False
+
+	def splitResponse(self, state):
+		if self.hands[0].canSplit():
+			print(state.printState(self))
+			result = ""
+			while not(result.lower() in ["y", "n"]):
+				result = input("Would you like to split? (Y/N): ")
+			return True if result=="y" else False
+		return False

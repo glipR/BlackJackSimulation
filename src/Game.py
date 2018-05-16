@@ -34,6 +34,7 @@ class Game:
 		"""
 		for player in self.playing_players:
 			card1, card2 = self.deck.pick_card(), self.deck.pick_card()
+			card2[VIS] = True
 			player.startHand(card1, card2)
 			if self.verbose:
 				print("{} received the\n\t{} and the\n\t{} {}".format(player.name, cardDescription(card1), cardDescription(card2), player.getScores()))
@@ -47,10 +48,12 @@ class Game:
 			self.updateGameState()
 			if player.surrenderResponse(self.gameState):
 				player.giveMoney(self.gameState.cur_bet()/2)
+				self.pool -= self.gameState.cur_bet()/2
 				if self.verbose:
 					print("{} Surrendered and recieved ${} back".format(player.name, self.gameState.cur_bet()/2))
 			else:
 				keep.append(player)
+		self.playing_players = keep
 
 	def offerSplit(self):
 		"""
@@ -62,6 +65,7 @@ class Game:
 				card1, card2 = self.deck.pick_card(), self.deck.pick_card()
 				player.setSplit(card1, card2)
 				player.takeMoney(self.gameState.cur_bet())
+				self.pool += self.gameState.cur_bet()
 				if self.verbose:
 					print("{} Split their hand, and recieved 2 new cards".format(player.name))
 
