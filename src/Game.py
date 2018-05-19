@@ -16,7 +16,7 @@ class Game:
 
 		self.players = [DummyPlayer.DummyPlayer(name= "AI1"),
 						DummyPlayer.DummyPlayer(name= "AI2"),
-						HumanPlayer.HumanPlayer(name= "Me")]
+						DummyPlayer.DummyPlayer(name= "AI3")]
 
 		self.playing_players = [player for player in self.players]
 
@@ -27,6 +27,8 @@ class Game:
 		self.pool = 0
 
 		self.gameState = GameState.gameState()
+
+		self.winning_players = []
 
 	def dealTwoCards(self):
 		"""
@@ -66,7 +68,6 @@ class Game:
 				player.giveMoney(self.gameState.cur_bet())
 				player.setSplit(card1, card2)
 				player.takeMoney(self.gameState.cur_bet(), player.hands[0])
-				print(player.hands[0].cur_bet)
 				player.takeMoney(self.gameState.cur_bet(), player.hands[1])
 				self.pool += self.gameState.cur_bet()
 				if self.verbose:
@@ -220,30 +221,27 @@ class Game:
 					for player in self.playing_players:
 						for hand in player.hands:
 							print("{} Hand {}: {}".format(player.name, player.hands.index(hand), hand.allHand()))
-				winning_players = self.comparePlayers(self.playing_players)
-				if len(winning_players) == 1:
-					player = winning_players[0][1]
+				self.winning_players = self.comparePlayers(self.playing_players)
+				if len(self.winning_players) == 1:
+					player = self.winning_players[0][1]
 					print("{} won the pool of ${}".format(player.name, self.pool))
 					player.giveMoney(self.pool)
-				elif len(set([x[1] for x in winning_players])) == 1:
-					player = winning_players[0][1]
+				elif len(set([x[1] for x in self.winning_players])) == 1:
+					player = self.winning_players[0][1]
 					print("{} won the pool of ${}".format(player.name, self.pool))
 					player.giveMoney(self.pool)
 				else:
 					player_dict = {}
-					for hand in winning_players:
+					for hand in self.winning_players:
 						if hand[1] not in player_dict.keys():
 							player_dict[hand[1]] = 0
 						player_dict[hand[1]] += 1
 					for key in player_dict.keys():
-						print("{} won {}/{} of the pool of ${}".format(key.name, player_dict[key], len(winning_players), self.pool*player_dict[key]//len(winning_players)))
-						key.giveMoney(self.pool * player_dict[key] // len(winning_players))
+						print("{} won {}/{} of the pool of ${}".format(key.name, player_dict[key], len(self.winning_players), self.pool*player_dict[key]//len(self.winning_players)))
+						key.giveMoney(self.pool * player_dict[key] // len(self.winning_players))
 
 	def updateGameState(self):
 		self.gameState.reset()
 		for player in self.players:
 			self.gameState.addPlayer(player)
 
-
-test = Game()
-test.playGame()
