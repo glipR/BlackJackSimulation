@@ -4,7 +4,7 @@ from Game import *
 class Test(Game):
 
 	def __init__(self):
-		self.iter = 20
+		self.iter = 3
 
 	def simulateReset(self):
 		results = []
@@ -23,6 +23,6 @@ for game in res:
 	print(f"Game: {i}")
 	for player in game[1]:
 		print(f"\tPlayer: {player.name}")
-		for hand in player.hands:
+		for hand in player.hands + player.dead_hands:
 			print(f"\t\tHand: {hand.allHand()} {'X' if hand in [y[0] for y in game[0]] else ''}")
 

@@ -17,9 +17,11 @@ class GenericPlayer:
 	def __init__(self, name = "Dummy"):
 		self.name = name
 		self.hands = []
+		self.dead_hands = []
 		self.cash = 10
 		self.cur_bet = 0
 		self.removing = []
+		self.dead = False
 
 	def startHand(self, card1, card2):
 		self.hands.append(Hand.Hand([card1, card2]))
@@ -57,6 +59,7 @@ class GenericPlayer:
 
 	def update(self):
 		for index in self.removing[::-1]:
+			self.dead_hands.append(self.hands[index])
 			del self.hands[index]
 		self.removing = []
 

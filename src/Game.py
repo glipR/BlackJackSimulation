@@ -50,6 +50,7 @@ class Game:
 			self.updateGameState()
 			if player.surrenderResponse(self.gameState):
 				player.giveMoney(self.gameState.cur_bet()/2)
+				player.dead = True
 				self.pool -= self.gameState.cur_bet()/2
 				if self.verbose:
 					print("{} Surrendered and recieved ${} back".format(player.name, self.gameState.cur_bet()/2))
@@ -91,6 +92,9 @@ class Game:
 		for hand, player in hands_arr:
 
 			self.updateGameState()
+
+			if self.gameState.players_alive() == 1:
+				return True
 
 			if self.verbose:
 				print("Player {}, Hand {}".format(player.name, player.hands.index(hand)))
@@ -148,6 +152,7 @@ class Game:
 		for x in range(len(self.playing_players)):
 			self.playing_players[x].update()
 			if len(self.playing_players[x].hands) == 0:
+				self.playing_players[x].dead = True
 				to_remove.append(x)
 		for y in sorted(to_remove)[::-1]:
 			if self.verbose:
@@ -212,33 +217,36 @@ class Game:
 		res = False
 		while not res and len(self.playing_players) > 1:
 			res = self.simRound()
-		if self.verbose:
-			if len(self.playing_players) == 0:
+		if len(self.playing_players) == 0:
+			if self.verbose:
 				print("The dealer wins!")
-			else:
+		else:
+			if self.verbose:
+				print("The remaining hands are:")
+				for player in self.playing_players:
+					for hand in player.hands:
+						print("{} Hand {}: {}".format(player.name, player.hands.index(hand), hand.allHand()))
+			self.winning_players = self.comparePlayers(self.playing_players)
+			if len(self.winning_players) == 1:
+				player = self.winning_players[0][1]
+				player.giveMoney(self.pool)
 				if self.verbose:
-					print("The remaining hands are:")
-					for player in self.playing_players:
-						for hand in player.hands:
-							print("{} Hand {}: {}".format(player.name, player.hands.index(hand), hand.allHand()))
-				self.winning_players = self.comparePlayers(self.playing_players)
-				if len(self.winning_players) == 1:
-					player = self.winning_players[0][1]
 					print("{} won the pool of ${}".format(player.name, self.pool))
-					player.giveMoney(self.pool)
-				elif len(set([x[1] for x in self.winning_players])) == 1:
-					player = self.winning_players[0][1]
+			elif len(set([x[1] for x in self.winning_players])) == 1:
+				player = self.winning_players[0][1]
+				player.giveMoney(self.pool)
+				if self.verbose:
 					print("{} won the pool of ${}".format(player.name, self.pool))
-					player.giveMoney(self.pool)
-				else:
-					player_dict = {}
-					for hand in self.winning_players:
-						if hand[1] not in player_dict.keys():
-							player_dict[hand[1]] = 0
-						player_dict[hand[1]] += 1
-					for key in player_dict.keys():
+			else:
+				player_dict = {}
+				for hand in self.winning_players:
+					if hand[1] not in player_dict.keys():
+						player_dict[hand[1]] = 0
+					player_dict[hand[1]] += 1
+				for key in player_dict.keys():
+					if self.verbose:
 						print("{} won {}/{} of the pool of ${}".format(key.name, player_dict[key], len(self.winning_players), self.pool*player_dict[key]//len(self.winning_players)))
-						key.giveMoney(self.pool * player_dict[key] // len(self.winning_players))
+					key.giveMoney(self.pool * player_dict[key] // len(self.winning_players))
 
 	def updateGameState(self):
 		self.gameState.reset()
