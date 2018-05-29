@@ -54,6 +54,6 @@ class gameState:
         inc = 0
         for player in self.players:
             if not player.dead:
-                if len(player.hands) > 0:
+                if len(player.hands) - len(player.removing)> 0:
                     inc += 1
         return inc
