@@ -245,8 +245,8 @@ class Game:
 					player_dict[hand[1]] += 1
 				for key in player_dict.keys():
 					if self.verbose:
-						print("{} won {}/{} of the pool of ${}".format(key.name, player_dict[key], len(self.winning_players), self.pool*player_dict[key]//len(self.winning_players)))
-					key.giveMoney(self.pool * player_dict[key] // len(self.winning_players))
+						print("{} won {}/{} of the pool of ${}".format(key.name, player_dict[key], len(self.winning_players), self.pool*player_dict[key]/len(self.winning_players)))
+					key.giveMoney(self.pool * player_dict[key] / len(self.winning_players))
 
 	def updateGameState(self):
 		self.gameState.reset()
