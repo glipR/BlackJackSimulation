@@ -25,7 +25,6 @@ class HumanPlayer(GenericPlayer):
 					if int(x) == 1:
 						return FOLLOW
 					elif int(x) == 2:
-						self.removing.append(self.hands.index(hand))
 						return FOLD
 				except:
 					continue

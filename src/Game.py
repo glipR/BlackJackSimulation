@@ -3,6 +3,7 @@ import Deck
 import DummyPlayer
 import HumanPlayer
 import GameState
+import Bots
 
 """
 Game Implementation
@@ -14,9 +15,14 @@ class Game:
 
 	def __init__(self):
 
-		self.players = [DummyPlayer.DummyPlayer(name= "AI1"),
-						DummyPlayer.DummyPlayer(name= "AI2"),
-						DummyPlayer.DummyPlayer(name= "AI3")]
+		self.players = [Bots.SimpleBully(name= "B1"),
+						Bots.SimpleBully(name= "B2"),
+						Bots.SimpleBully(name= "B3")]
+		
+
+		#self.players = [DummyPlayer.DummyPlayer(name = "AI 1"),
+		#				DummyPlayer.DummyPlayer(name = "AI 2"),
+		#				DummyPlayer.DummyPlayer(name = "AI 3")]
 
 		self.playing_players = [player for player in self.players]
 
@@ -50,6 +56,7 @@ class Game:
 			self.updateGameState()
 			if player.surrenderResponse(self.gameState):
 				player.giveMoney(self.gameState.cur_bet()/2)
+				player.removeHand(player.hands[0])
 				player.dead = True
 				self.pool -= self.gameState.cur_bet()/2
 				if self.verbose:
@@ -101,7 +108,13 @@ class Game:
 
 			## Betting
 
-			betResponse = player.betResponse(hand, self.gameState)
+			if player.cash > 0:
+				betResponse = player.betResponse(hand, self.gameState)
+			else:
+				if player.cur_bet < self.gameState.cur_bet():
+					betResponse = FOLD
+				else:
+					betResponse = STAND
 			if betResponse == RAISE:
 				all_stand = False
 				if self.verbose:
@@ -119,6 +132,7 @@ class Game:
 				if self.verbose:
 					print("\tStands")
 			elif betResponse == FOLD:
+				player.removeHand(hand)
 				all_stand = False
 				if self.verbose:
 					print("\tFolds")

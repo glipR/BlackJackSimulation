@@ -57,6 +57,9 @@ class GenericPlayer:
 		if not self.hands[self.hands.index(hand)].isValid():
 			self.removing.append(self.hands.index(hand))
 
+	def removeHand(self, hand):
+		self.removing.append(self.hands.index(hand))
+
 	def update(self):
 		for index in self.removing[::-1]:
 			self.dead_hands.append(self.hands[index])

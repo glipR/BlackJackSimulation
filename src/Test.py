@@ -4,11 +4,12 @@ from Game import *
 class Test(Game):
 
 	def __init__(self):
-		self.iter = 10000
+		self.iter = 1000
 
 	def simulateReset(self):
 		results = []
 		for x in range(self.iter):
+			print(f"Game: {x}")
 			Game.__init__(self)
 			self.verbose = False
 			self.playGame()

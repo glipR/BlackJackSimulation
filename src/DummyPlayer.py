@@ -13,7 +13,6 @@ class DummyPlayer(GenericPlayer):
 			if hand.score() > 15 + board_bet and self.cash > 0:
 				return FOLLOW
 			else:
-				self.removing.append(self.hands.index(hand))
 				return FOLD
 		elif hand.score() > 16 + board_bet and self.cash > 0:
 			return RAISE
