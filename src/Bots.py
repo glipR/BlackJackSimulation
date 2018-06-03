@@ -140,7 +140,7 @@ class Calculator(GenericPlayer):
     
     def hitResponse(self, hand, state):
         if hand.score() > 18:
-            return STAND
+            return DONE
 
         
         count_aces = 0
@@ -157,7 +157,7 @@ class Calculator(GenericPlayer):
                 busts += temp[1][key]
 
         if busts/temp[0]>0.2:
-            return STAND
+            return DONE
         return HIT
 
     def betResponse(self, hand, state):

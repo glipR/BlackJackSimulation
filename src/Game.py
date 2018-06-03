@@ -14,13 +14,11 @@ Game Implementation
 class Game:
 
 	def __init__(self):
-
-		self.players = [Bots.Calculator(name= "B1"),
-						Bots.OpenMindedBully(name= "B2"),
-						Bots.SimpleBully(name= "B3"),
-                                Bots.LuckyDisciple(name= "B4"),
-                                Bots.UnluckyDisciple(name= "B5")]
-		
+		self.players = [Bots.SimpleBully(name= "Simple Bully"),
+						Bots.LuckyDisciple(name= "Lucky Disciple"),
+						Bots.UnluckyDisciple(name= "Unlucky Disciple"),
+						Bots.OpenMindedBully(name= "Open Minded Bully"),
+						Bots.Calculator(name= "Calculator")]
 
 		#self.players = [DummyPlayer.DummyPlayer(name = "AI 1"),
 		#				DummyPlayer.DummyPlayer(name = "AI 2"),
@@ -108,6 +106,10 @@ class Game:
 			if self.verbose:
 				print("Player {}, Hand {}".format(player.name, player.hands.index(hand)))
 
+				print([hand.allHand() for hand in player.hands])
+				print(player.removing)
+
+
 			## Betting
 
 			if player.cash > 0:
@@ -157,10 +159,12 @@ class Game:
 					player.hit(card, hand)
 					if self.verbose:
 						print("\tHit and recieved the {}".format(cardDescription(card)))
-				if hitResponse == DONE:
+				elif hitResponse == DONE:
 					player.hands[player.hands.index(hand)].done = True
 					if self.verbose:
 						print("\tDoes not hit")
+				else:
+					raise ValueError("I don't understand hitting response {}".format(hitResponse))
 
 		# Remove any hands / players that busted
 
@@ -237,12 +241,18 @@ class Game:
 			if self.verbose:
 				print("The dealer wins!")
 		else:
+			for player in self.players:
+				player.update()
 			if self.verbose:
 				print("The remaining hands are:")
 				for player in self.playing_players:
 					for hand in player.hands:
 						print("{} Hand {}: {}".format(player.name, player.hands.index(hand), hand.allHand()))
 			self.winning_players = self.comparePlayers(self.playing_players)
+			for player in self.playing_players:
+				for hand in player.hands:
+					if (hand, player) not in self.winning_players:
+						player.removeHand(hand)
 			if len(self.winning_players) == 1:
 				player = self.winning_players[0][1]
 				player.giveMoney(self.pool)
