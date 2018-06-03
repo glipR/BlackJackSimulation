@@ -19,8 +19,8 @@ class SimpleBully(GenericPlayer):
 
     def surrenderResponse(self, state):
         if self.hands[0].cards[self.hands[0].cards[1][VIS]][FACE] not in ["A","J","Q","K","T"]:
-            return False
-        return True
+            return True
+        return False
 
     def splitResponse(self, state):
         #two K/Q/T is a strong hand
@@ -50,10 +50,10 @@ class OpenMindedBully(GenericPlayer):
 
     def surrenderResponse(self, state):
         if self.hands[0].cards[self.hands[0].cards[1][VIS]][FACE] in ["A","J","Q","K","T"]:
-            return True
+            return False
         if self.hands[0].score()<12 and int(self.hands[0].cards[self.hands[0].cards[1][VIS]][FACE]) > 6:
-            return True
-        return False
+            return False
+        return True
 
     def splitResponse(self, state):
         if self.hands[0].canSplit() and self.hands[0].cards[0] not in ["T","K","Q","5","6","7","8","9"]:
@@ -85,7 +85,7 @@ class Calculator(GenericPlayer):
                 total+=1
                 visible[card[FACE]] += 1
 
-        for key in visible:
+        for key in visible.keys():
             visible[key]=4-visible[key]
         return [total,visible]
     
@@ -95,7 +95,7 @@ class Calculator(GenericPlayer):
         visible = temp[1]
         current = self.hands[0].score()
         pool = 22*[0]
-        for key in visible:
+        for key in visible.keys():
             if key != 'A':
                 after = current + MIN_VALUE[key]
                 pool[self.bust2(after)] += 4-visible[key]
@@ -152,7 +152,7 @@ class Calculator(GenericPlayer):
                 card_sum += MIN_VALUE[card[FACE]]
         temp = self.getSurrounding(state)
         busts = 0
-        for key in temp[1]:
+        for key in temp[1].keys():
             if MIN_VALUE[key] + card_sum>21:
                 busts += temp[1][key]
 
@@ -163,7 +163,7 @@ class Calculator(GenericPlayer):
     def betResponse(self, hand, state):
         i = self.info(state)
         if state.cur_bet() > hand.cur_bet:
-            if i>0.25:
+            if i > 0.25:
                 return FOLLOW
             return FOLD
         else:

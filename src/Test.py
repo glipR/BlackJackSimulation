@@ -25,14 +25,14 @@ i = 0
 first = True
 for game in res:
 	i += 1
-	print(f"Game: {i}")
+	#print(f"Game: {i}")
 	start = first
 	for player in game[1]:
 		if start:
 			first = False
 			win_dic[player.name] = []
 			cash_dic[player.name] = []
-		print(player.name +":", len(player.hands), len(player.removing))
+		#print(player.name +":", len(player.hands), len(player.removing))
 		win_dic[player.name].append(True if len(player.hands) - len(player.removing) > 0 else False)
 		cash_dic[player.name].append(player.cash-10)
 		#print(f"\tPlayer: {player.name}")
