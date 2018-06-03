@@ -153,7 +153,7 @@ class Calculator(GenericPlayer):
         temp = self.getSurrounding(state)
         busts = 0
         for key in temp[1]:
-            if MIN_VALUE[CARD[FACE]] + card_sum>21:
+            if MIN_VALUE[key] + card_sum>21:
                 busts += temp[1][key]
 
         if busts/temp[0]>0.2:
@@ -233,6 +233,7 @@ class LuckyDisciple(GenericPlayer):
         return True
 
     def splitResponse(self, state):
+        
         table = self.table2()
         if not self.hands[0].canSplit():
             return False
@@ -242,7 +243,7 @@ class LuckyDisciple(GenericPlayer):
         
         for hand in state.getHandsExcluding(self.name):
             card = hand.cards[hand.cards[1][VIS]][FACE]
-            if 'SP' in table3[hand.score()-1][MIN_VALUE[card]-1]:
+            if 'SP' in table3[hand.score()//2-1][MIN_VALUE[card]-1]:
                 return True
         return False
 
@@ -302,6 +303,6 @@ class UnluckyDisciple(GenericPlayer):
         
         for hand in state.getHandsExcluding(self.name):
             card = hand.cards[hand.cards[1][VIS]][FACE]
-            if 'SP' not in table3[hand.score()-1][MIN_VALUE[card]-1]:
+            if 'SP' not in table3[hand.score()//2-1][MIN_VALUE[card]-1]:
                 return False
         return True

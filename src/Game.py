@@ -15,9 +15,11 @@ class Game:
 
 	def __init__(self):
 
-		self.players = [Bots.SimpleBully(name= "B1"),
-						Bots.SimpleBully(name= "B2"),
-						Bots.SimpleBully(name= "B3")]
+		self.players = [Bots.Calculator(name= "B1"),
+						Bots.OpenMindedBully(name= "B2"),
+						Bots.SimpleBully(name= "B3"),
+                                Bots.LuckyDisciple(name= "B4"),
+                                Bots.UnluckyDisciple(name= "B5")]
 		
 
 		#self.players = [DummyPlayer.DummyPlayer(name = "AI 1"),
