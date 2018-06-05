@@ -9,7 +9,7 @@ class Test(Game):
 
 	def simulateReset(self):
 		final = []
-		for array in generate(2):
+		for array in generate(5):
 			results = []
 			for x in range(self.iter):
 				#print(f"Game: {x+1}")
