@@ -1,6 +1,8 @@
 from constants import *
 from Game import *
 
+player_codes = [1, 2, 3, 4, 5]
+
 class Test(Game):
 
 	def __init__(self):

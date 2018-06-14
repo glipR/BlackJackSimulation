@@ -2,6 +2,9 @@ from constants import *
 from Game import *
 import copy
 
+
+#This test checks for cases where the board is overwhelmingly of a single strategy.
+
 class Test(Game):
 
 	def __init__(self):
@@ -38,27 +41,17 @@ class Test(Game):
 			final.append(results)
 		return final
 
-
+## Changed from permutations to 4vs1 permutations
 def generate(n):
 	tmp = []
-	array = list(range(n))
-	c = [0]*n
-	tmp.append(copy.copy(array))
-	i = 0
-	while i < n:
-		if c[i] < i:
-			if i%2 ==0:
-				array[0], array[i] = array[i], array[0]
-			else:
-				array[c[i]], array[i] = array[i], array[c[i]]
-			tmp.append(copy.copy(array))
-			c[i] += 1
-			i=0
-		else:
-			c[i] = 0
-			i += 1
+	for x in range(n):
+		for y in range(n):
+			if x != y:
+				for z in range(n):
+					tmp2 = [x]*n
+					tmp2[z] = y
+					tmp.append(tmp2)
 	return tmp
-
 
 
 test = Test()
@@ -84,33 +77,23 @@ for match in res:
 			for hand in player.hands + player.dead_hands:
 				#print(f"\t\tHand: ({hand.cur_bet}) {hand.allHand()} {'X' if hand in [y[0] for y in game[0]] else ''}")
 				continue
+	names = [p.name for p in match[0][1]]
+	set_names = list(set(names))
+	assert len(set_names) == 2, "Should be exactly 2 distinct bots"
+
+	alone = set_names[0] if names.count(set_names[0]) == 1 else set_names[1]
+	group = set_names[1] if names.count(set_names[0]) == 1 else set_names[0]
 	for player in match[0][1]:
-		win_percent = (sum(win_dic[player.name])/test.iter*100)
-		total_winnings = (sum(cash_dic[player.name]))
-		if sum(win_dic[player.name]) != 0:
-			average_win = (sum([cash_dic[player.name][x] for x in range(len(cash_dic[player.name])) if win_dic[player.name][x]])/sum(win_dic[player.name]))
-		else:
-			average_win = 0
-		if sum(win_dic[player.name]) != len(win_dic[player.name]):
-			average_loss = (sum([cash_dic[player.name][x] for x in range(len(cash_dic[player.name])) if not win_dic[player.name][x]])/(len(win_dic[player.name])-sum(win_dic[player.name])))
-		else:
-			average_loss = 0
-		## NAME, ORDER, WIN%, TOTAL_WINNINGS, AVG_WIN, AVG_LOSS
-		print(",".join([player.name, str(match[0][1].index(player)), "%.2f" % win_percent, "%.2f" % total_winnings, "%.2f" % average_win, "%.2f" % average_loss]))
-
-# print("\n")
-# for name in [player.name for player in test.players]:
-# 	print(name, "\n")
-# 	print("Win %:", "%.2f" % (sum(win_dic[name])/test.iter*100))
-# 	print("Total winnings:", "%.0f" % (sum(cash_dic[name])))
-# 	print()
-# 	if sum(win_dic[name]) != 0:
-# 		print("Average Win:", "%.2f" % (sum([cash_dic[name][x] for x in range(len(cash_dic[name])) if win_dic[name][x]])/sum(win_dic[name])))
-# 	else:
-# 		print("Average Win:", 0)
-# 	if sum(win_dic[name]) != len(win_dic[name]):
-# 		print("Average Loss:", "%.2f" % (sum([cash_dic[name][x] for x in range(len(cash_dic[name])) if not win_dic[name][x]])/(len(win_dic[name])-sum(win_dic[name]))))
-# 	else:
-# 		print("Average Loss:", 0)
-
-# 	print("\n")
+		if player.name == alone:
+			win_percent = (sum(win_dic[player.name])/test.iter*100)
+			total_winnings = (sum(cash_dic[player.name]))
+			if sum(win_dic[player.name]) != 0:
+				average_win = (sum([cash_dic[player.name][x] for x in range(len(cash_dic[player.name])) if win_dic[player.name][x]])/sum(win_dic[player.name]))
+			else:
+				average_win = 0
+			if sum(win_dic[player.name]) != len(win_dic[player.name]):
+				average_loss = (sum([cash_dic[player.name][x] for x in range(len(cash_dic[player.name])) if not win_dic[player.name][x]])/(len(win_dic[player.name])-sum(win_dic[player.name])))
+			else:
+				average_loss = 0
+			## NAME, ORDER, WIN%, TOTAL_WINNINGS, AVG_WIN, AVG_LOSS, GROUP_AGAINST
+			print(",".join([player.name, str(match[0][1].index(player)), "%.2f" % win_percent, "%.2f" % total_winnings, "%.2f" % average_win, "%.2f" % average_loss, group]))

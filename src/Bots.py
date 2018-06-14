@@ -156,24 +156,25 @@ class Calculator(GenericPlayer):
             if MIN_VALUE[key] + card_sum>21:
                 busts += temp[1][key]
 
-        if busts/temp[0]>0.2:
+        if busts/temp[0]>0.3:
             return DONE
         return HIT
 
     def betResponse(self, hand, state):
         i = self.info(state)
         if state.cur_bet() > hand.cur_bet:
-            if i > 0.25:
+            if i > 0.10:
                 return FOLLOW
             return FOLD
+            
         else:
-            if i > 0.5:
+            if i > 0.1:
                 return RAISE
             return FOLLOW
 
 
     def surrenderResponse(self, state):
-        if self.info(state) > 0.3:
+        if self.info(state) < 0.05:
             return True
         return False
 
